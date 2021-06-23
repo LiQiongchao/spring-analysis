@@ -115,6 +115,7 @@
 
 ```java
 public static void main(String[] args) {
+    // 不支持 xml 文件名大写，支持占位符写法，如: application-${profile}.xml
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("config.xml");
     SimpleBean bean = context.getBean(SimpleBean.class);
     bean.send();
@@ -178,6 +179,14 @@ protected ResourcePatternResolver getResourcePatternResolver() {
 
 PathMatchingResourcePatternResolver支持Ant风格的路径解析。
 
+> Ant风格: 支持模糊路径匹配。如: /**/\*.jsp 表示匹配所有的jsp结尾的文件。
+>
+> ?: 匹配任意单字符
+>
+> *: 匹配0或者任意数量的字符
+>
+> **: 匹配0或者更多的目录
+
 ### 设置配置文件路径
 
 即AbstractRefreshableConfigApplicationContext.setConfigLocations:
@@ -204,7 +213,7 @@ protected String resolvePath(String path) {
 }
 ```
 
-此方法的目的在于将占位符(placeholder)解析成实际的地址。比如可以这么写: `new ClassPathXmlApplicationContext("classpath:config.xml");`那么classpath:就是需要被解析的。
+此方法的目的在于将占位符(placeholder)解析成实际的地址。比如可以这么写: `new ClassPathXmlApplicationContext("classpath:config.xml");`那么classpath:就是需要被解析的。（主要解析使用 ${} 和 {} 包含的值，详情`org.springframework.util.PropertyPlaceholderHelper#parseStringValue`）
 
 getEnvironment方法来自于ConfigurableApplicationContext接口，源码很简单，如果为空就调用createEnvironment创建一个。AbstractApplicationContext.createEnvironment:
 
@@ -254,7 +263,7 @@ context.getEnvironment().setActiveProfiles("dev");
 
 这里的Property指的是程序运行时的一些参数，引用注释:
 
-> > properties files, JVM system properties, system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects,Maps, and so on.
+> properties files, JVM system properties, system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects,Maps, and so on.
 
 #### Environment构造器
 
